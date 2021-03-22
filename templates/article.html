@@ -73,7 +73,7 @@
   {# backlinks #}
   {% if article['backlinks_from'] %}
     <section class="article__backlinks ts">
-      <h2>Backlinks from</h2>
+      <h3>Other page(s) pointing to this page</h3>
       <ul>
         {% for backlink in article['backlinks_from'] %}
           <li><a href="{{ backlink}}.html">{{ backlink }}</a></li>
