@@ -2,7 +2,7 @@ import os
 import sys
 import shutil
 import traceback
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Template, Environment, FileSystemLoader, BaseLoader
 import markdown
 from PIL import Image
 from bs4 import BeautifulSoup
@@ -360,6 +360,13 @@ for article in sorted_articles_list:
 # Site generation
 # ------------------------------------------------
 
+def get_template(template):
+    if os.path.isfile('templates/' + template):
+        template_file = open('templates/' + template, 'r').read()
+    else:
+        template_file = open('dok/templates/' + template, 'r').read()
+    return template_file
+
 pages_sum = 0
 
 # Make directories if they don't exist
@@ -374,7 +381,7 @@ for item in public_items:
 print(':: Public folder — cleaned')
 
 # Generate index page
-index_template = ENV_DIR.get_template('index.html')
+index_template = ENV_DIR.from_string(get_template('index.html'))
 index_html = index_template.render(articles=articles, settings=settings)
 with open('public/index.html', 'w') as file:
     file.write(index_html)
@@ -382,7 +389,7 @@ pages_sum += 1
 print(':: Index page — created')
 
 # Generate content page
-content_template = ENV_DIR.get_template('content.html')
+content_template = ENV_DIR.from_string(get_template('content.html'))
 content_html = content_template.render(articles=articles, settings=settings)
 with open('public/content.html', 'w') as file:
     file.write(content_html)
@@ -390,7 +397,7 @@ pages_sum += 1
 print(':: Content page — created')
 
 # Generate article pages
-article_template = ENV_DIR.get_template('article.html')
+article_template = ENV_DIR.from_string(get_template('article.html'))
 articles_sum = 0
 for article in articles:
     articles_sum += 1
@@ -403,7 +410,7 @@ for article in articles:
 print(':: Article pages — created (' + str(articles_sum) + ')')
 
 # Generate tag pages
-tag_template = ENV_DIR.get_template('tag.html')
+tag_template = ENV_DIR.from_string(get_template('tag.html'))
 tags_sum = 0
 for tag in tags:
     tags_sum += 1
