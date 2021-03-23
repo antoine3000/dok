@@ -92,6 +92,7 @@ class Article:
             'parent': self.parent,
             'parent_url': self.parent + '.html',
             'title': self.title,
+            'translation': self.translation,
             'toc': self.toc,
             'publication_date': self.publication_date,
             'last_update': self.last_update,
@@ -173,6 +174,10 @@ class Article:
             self.tags = metadata['tags'][0].split(', ')
         except KeyError:
             self.tags = []
+        try:
+            self.translation = eval(metadata['translation'][0])
+        except KeyError:
+            self.translation = False
 
     def get_backlinks_to(self, content):
         backlinks_to = []
@@ -259,13 +264,21 @@ def html_update(html, slug):
     html = html.replace('href="button:', 'class="btn" href="')
     # figure
     soup = BeautifulSoup(html, 'lxml')
+    # Image slug if translation
+    image_slug = article_slug
+    try:
+        parent = articles[slug]['parent']
+        if articles[parent]['translation']:
+            image_slug = parent
+    except KeyError:
+        pass
     for img_tag in soup.findAll('img'):
         caption = soup.new_tag('figcaption')
         caption.append(img_tag['alt'])
         img_tag.append(caption)
         img_tag['loading'] = 'lazy'
         fig_tag = soup.new_tag("figure")
-        img_tag['src'] = 'medias/' + article_slug + '-' + img_tag['src']
+        img_tag['src'] = 'medias/' + image_slug + '-' + img_tag['src']
         img_src = img_tag['src']
         if "large:" in img_src:
             fig_tag['class'] = 'lg'

@@ -44,8 +44,8 @@
   @extend %font-body-bold;
   font-size: var(--size-xxl);
   line-height: 1.2;
-  @include media('<sm') {
-    font-size: var(--size-xl);
+  @include media('<xs') {
+    font-size: calc(var(--size-xxl)/4*3);
   }
 }
 %ts-title-1 {
