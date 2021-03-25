@@ -232,7 +232,7 @@ def media_process(origin, destination):
         if destination.endswith(tuple(['jpg', 'jpeg', 'png', 'JPG', 'JPEG'])):
             img = Image.open(destination)
             if img.mode in ('RGBA', 'LA'):
-                background = Image.new(img.mode[:-1], img.size, '#FFFFFF')
+                background = Image.new(img.mode[:-1], img.size, '#f6f4f2')
                 background.paste(img, img.split()[-1])
                 img = background
             wpercent = (IMG_MAX_WIDTH/float(img.size[0]))
