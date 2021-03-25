@@ -451,7 +451,9 @@ SCSS_MAP = {SCSS_FILE: "public/assets/main.css"}
 CSS_MAP = {"public/assets/main.css": "public/assets/main.min.css"}
 FONTS_PATH_DOK = 'dok/assets/fonts/'
 FONTS_PATH_USER = 'assets/fonts/'
+IMAGES_PATH= 'assets/images/'
 FONTS_PUBLIC = 'public/assets/fonts/'
+IMAGES_PUBLIC = 'public/assets/images/'
 
 
 def compile_scss(scss):
@@ -468,9 +470,11 @@ def minify_css(css):
                 outfile.write(rcssmin.cssmin(infile.read()))
 
 
-# Create fonts directory if it doesn't exist yet
+# Create directories if they don't exist yet
 if not os.path.exists(FONTS_PUBLIC):
     os.makedirs(FONTS_PUBLIC)
+if not os.path.exists(IMAGES_PUBLIC):
+    os.makedirs(IMAGES_PUBLIC)
 
 # Copy fonts to public
 if os.path.isdir(FONTS_PATH_USER):
@@ -483,6 +487,13 @@ if os.path.isdir(fonts_path):
     for font_file in fonts:
         if not os.path.isfile(FONTS_PUBLIC + font_file):
             shutil.copy2(fonts_path + font_file, FONTS_PUBLIC + font_file)
+
+# Copy images to public
+if os.path.isdir(IMAGES_PATH):
+    images = os.listdir(IMAGES_PATH)
+    for image_file in images:
+        if not os.path.isfile(IMAGES_PUBLIC + image_file):
+            shutil.copy2(IMAGES_PATH + image_file, IMAGES_PUBLIC + image_file)
 
 # Compile, minimize css
 if os.path.isfile(SCSS_FILE):
