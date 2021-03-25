@@ -2,7 +2,7 @@
 
 {% set open = article['open'] | string() %}
 
-<article class="article" id="{{ article['slug'] }}">
+<article class="article {% if (open == 'False') and (article['childs_slug']|length > 0) %} index {% endif %}" id="{{ article['slug'] }}">
   {# title #}
   <h1 class="article__title">{{ article['title'] }}</h1>
   {# parent #}
