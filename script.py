@@ -116,7 +116,8 @@ class Article:
             print('☹  "' + self.name + '" must be renamed to start with a date (DD-MM-YYYY-) ☹')
             sys.exit()
         # slug
-        slug = self.name[11:] if len(self.name) > 11 else self.name
+        slug_text = self.name[11:] if len(self.name) > 11 else self.name
+        slug = slug_text.strip()
         if not slug in slug_list:
             slug_list.append(slug)
         else:
@@ -253,7 +254,8 @@ def wrap(to_wrap, wrap_in):
 
 
 def slugify(path):
-    slug = os.path.basename(os.path.normpath(path))[11:] if len(path) >= 11 else path
+    slug_text = os.path.basename(os.path.normpath(path))[11:] if len(path) >= 11 else path
+    slug = slug_text.strip()
     return slug
 
 
@@ -331,6 +333,8 @@ for current, childs, files in os.walk(CONTENT_DIR):
         if str(file) == '_index.md':
             # Save this folder as an article
             articles_list.append(Article(path=current, markdown=file, childs=childs))
+        if str(file) == '.DS_Store':
+            os.remove(current + '/' + file)
         elif not os.path.isdir(file):
             item_slug = slugify(current)
             item_path = current + '/' + file
@@ -520,17 +524,14 @@ fg.language(settings['language'])
 rssfeed = fg.rss_str(pretty=True)
 
 for article in articles:
-
     date = articles[article]["last_update"] if articles[article]["last_update"] else articles[article]["publication_date"]
-
     if not articles[article]["draft"] and articles[article]["content"]:
         fe = fg.add_entry()
         fe.title(articles[article]["title"])
         fe.link(href=settings['main_url'] + '/' + articles[article]["slug"] + '.html')
         fe.author({'name': settings['title']})
         fe.description(articles[article]["content"][:800] + '...')
-        fe.pubDate(datetime.strptime(date,
-                                     '%d/%m/%Y').strftime('%a %b %d %H:%M:%S %Y') + ' +0200')
+        fe.pubDate(datetime.strptime(date, '%d/%m/%Y').strftime('%a %b %d %H:%M:%S %Y') + ' +0200')
 fg.rss_file('public/rss.xml')
 print(":: RSS feed — updated")
 
