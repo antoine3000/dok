@@ -10,6 +10,7 @@ from datetime import datetime
 import yaml
 import rcssmin
 import sass
+from feedgen.feed import FeedGenerator
 
 CONTENT_DIR = 'content'
 PUBLIC_DIR = 'public'
@@ -97,6 +98,7 @@ class Article:
             'publication_date': self.publication_date,
             'last_update': self.last_update,
             'open': self.open,
+            'draft': self.draft,
             'reverse_order': self.reverse_order,
             'has_parent': self.has_parent,
             'backlinks_to': self.backlinks_to,
@@ -158,6 +160,10 @@ class Article:
             self.open = eval(metadata['open'][0])
         except KeyError:
             self.open = False
+        try:
+            self.draft = eval(metadata['draft'][0])
+        except KeyError:
+            self.draft = False
         try:
             self.reverse_order = eval(metadata['reverse_order'][0])
         except KeyError:
@@ -441,7 +447,6 @@ print(':: Tag pages — created (' + str(tags_sum) + ')')
 # ------------------------------------------------
 
 
-
 if not os.path.exists('assets'):
     SCSS_FILE = "dok/assets/css/main.scss"
 else:
@@ -500,6 +505,35 @@ if os.path.isfile(SCSS_FILE):
     compile_scss(SCSS_MAP)
     minify_css(CSS_MAP)
     print(":: CSS — compiled and minified")
+
+
+# ------------------------------------------------
+# RSS feed
+# ------------------------------------------------
+
+fg = FeedGenerator()
+fg.title(settings['title'])
+fg.author({'name': settings['title']})
+fg.link(href=settings['main_url'], rel='alternate')
+fg.subtitle(settings['description'])
+fg.language(settings['language'])
+rssfeed = fg.rss_str(pretty=True)
+
+for article in articles:
+
+    date = articles[article]["last_update"] if articles[article]["last_update"] else articles[article]["publication_date"]
+
+    if not articles[article]["draft"] and articles[article]["content"]:
+        fe = fg.add_entry()
+        fe.title(articles[article]["title"])
+        fe.link(href=settings['main_url'] + '/' + articles[article]["slug"] + '.html')
+        fe.author({'name': settings['title']})
+        fe.description(articles[article]["content"][:800] + '...')
+        fe.pubDate(datetime.strptime(date,
+                                     '%d/%m/%Y').strftime('%a %b %d %H:%M:%S %Y') + ' +0200')
+fg.rss_file('public/rss.xml')
+print(":: RSS feed — updated")
+
 
 
 # ------------------------------------------------

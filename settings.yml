@@ -1,6 +1,9 @@
-title: Dok
-description: documentation system
+title: "Dok"
+description: "documentation system"
+language: "en"
+main_url: "https://domingoclub.com/"
 introduction: "Dok, a low-tech tool that allows you to document (almost) everything"
+footer: "Dok ☼&nbsp;2021 — [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)"
 navigation:
   "Dok": "index"
   "Content": "content"
