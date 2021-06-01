@@ -100,6 +100,7 @@ class Article:
             'open': self.open,
             'draft': self.draft,
             'reverse_order': self.reverse_order,
+            'no_interface': self.no_interface,
             'has_parent': self.has_parent,
             'backlinks_to': self.backlinks_to,
             'backlinks_from': self.backlinks_from
@@ -169,6 +170,10 @@ class Article:
             self.reverse_order = eval(metadata['reverse_order'][0])
         except KeyError:
             self.reverse_order = False
+        try:
+            self.no_interface = eval(metadata['no_interface'][0])
+        except KeyError:
+            self.no_interface = False
         try:
             self.last_update = datetime.strptime(metadata['last_update'][0], '%Y-%m-%d').strftime('%d/%m/%Y')
         except KeyError:

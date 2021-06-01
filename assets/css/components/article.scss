@@ -14,6 +14,9 @@
   & + .article__content {
     margin-top: var(--size-md);
   }
+  .article--sub & {
+    @extend %ts-title-1;
+  }
 }
 .article__content {
   margin-top: var(--size-md);
@@ -127,10 +130,7 @@
 // Button
 .ts .btn {
   display: inline-block;
-  background-color: var(--action-color);
-  color: var(--base-color);
-  padding: var(--size-lg);
-  border: var(--border-sm) solid var(--base-color);
+  padding: var(--size-xs);
 }
 
 // Video
