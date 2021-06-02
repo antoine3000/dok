@@ -433,9 +433,9 @@ for article in articles:
     article_slug = articles[article]['slug']
     article_url = 'public/' + article_slug + '.html'
     article_html = article_template.render(article=articles[article], articles=articles, settings=settings)
-    article_html_updated = html_update(article_html, article_slug)
+    articles[article]["content"] = html_update(article_html, article_slug)
     with open(article_url, 'w') as file:
-        file.write(article_html_updated)
+        file.write(articles[article]["content"])
 print(':: Article pages — created (' + str(articles_sum) + ')')
 
 # Generate tag pages
@@ -536,7 +536,7 @@ for article in articles:
         fe.title(articles[article]["title"])
         fe.link(href=settings['main_url'] + '/' + articles[article]["slug"] + '.html')
         fe.author({'name': settings['title']})
-        fe.description(articles[article]["content"][:800] + '...')
+        fe.description(articles[article]["content"][:1800] + '...')
         fe.pubDate(datetime.strptime(date, '%d/%m/%Y').strftime('%a %b %d %H:%M:%S %Y') + ' +0200')
 fg.rss_file('public/rss.xml')
 print(":: RSS feed — updated")
