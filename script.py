@@ -259,7 +259,8 @@ def wrap(to_wrap, wrap_in):
 
 
 def slugify(path):
-    slug_text = os.path.basename(os.path.normpath(path))[11:] if len(path) >= 11 else path
+    path_clean = os.path.basename(os.path.normpath(path))
+    slug_text = path_clean[11:] if len(path_clean) >= 11 else path_clean
     slug = slug_text.strip()
     return slug
 
