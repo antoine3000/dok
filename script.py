@@ -332,13 +332,14 @@ except FileNotFoundError:
 # Loop through every folder in content and add the objects to a list
 articles_list = []
 slug_list = []
+
 for current, childs, files in os.walk(CONTENT_DIR):
     # Loop through every files in folder
     for file in files:
         if str(file) == '_index.md':
             # Save this folder as an article
             articles_list.append(Article(path=current, markdown=file, childs=childs))
-        if str(file) == '.DS_Store':
+        elif str(file) == '.DS_Store':
             os.remove(current + '/' + file)
         elif not os.path.isdir(file):
             item_slug = slugify(current)
