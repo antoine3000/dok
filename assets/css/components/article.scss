@@ -78,10 +78,13 @@
 }
 .article figure.sm {
   max-width: 100%;
-  width: 100%;
-  @include media('>sm') {
-    width: calc(#{var(--content-max-width)}/2 - #{var(--size-sm)}/2);
-    margin-right: var(--size-sm)/2;
+  width: calc(50% - var(--size-sm));
+  &:nth-child(odd) {
+    margin-right: var(--size-sm);
+  }
+  img {
+    width: 100%;
+    margin: 0;
   }
   display: inline-block;
   vertical-align: top;
