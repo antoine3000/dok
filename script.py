@@ -434,9 +434,9 @@ for article in articles:
     article_slug = articles[article]['slug']
     article_url = 'public/' + article_slug + '.html'
     article_html = article_template.render(article=articles[article], articles=articles, settings=settings)
-    articles[article]["content"] = html_update(article_html, article_slug)
+    article_html_updated = html_update(article_html, article_slug)
     with open(article_url, 'w') as file:
-        file.write(articles[article]["content"])
+        file.write(article_html_updated)
 print(':: Article pages — created (' + str(articles_sum) + ')')
 
 # Generate tag pages

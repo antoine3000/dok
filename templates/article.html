@@ -46,17 +46,10 @@
       {# toc #}
       {% if (article['toc']) or (article['childs'])%}
       <section class="article__toc">
-        <h3 class="toc__title--sub"><a href="{{ article['slug'] }}.html#content">{{ article['title']}}&nbsp;↓</h3>
-        {% if article['toc'] %}
-          <div class="toc__list">{{ article['toc'] }}</div>
-        {% endif %}
         {% if article['childs'] %}
           {% for child in article['childs_slug'] %}
             {% set article_child = articles[child] %}
             <h3 class="toc__title--sub"><a href="{{ article['slug'] }}.html#{{ article_child['slug'] }}">{{ article_child['title'] }}&nbsp;↓</a></h3>
-            {% if article_child['toc'] %}
-              <div class="toc__list--sub">{{ article_child['toc'] }}</div>
-            {% endif %}
           {% endfor %}
         {% endif %}
       </section>
