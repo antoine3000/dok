@@ -20,7 +20,7 @@
 }
 .article__content {
   margin-top: var(--size-md);
-  & > *:not(.lg):not(pre):not(.embed-container) {
+  & > *:not(.lg):not(pre):not(.embed-container):not(video) {
     max-width: var(--content-max-width);
   }
 }
@@ -138,7 +138,7 @@
 
 // Video
 .ts video {
-  max-width: 100%;
+  max-width: auto;
   width: 100%;
   display: block;
 }
