@@ -303,11 +303,16 @@ def html_update(html, slug):
         else:
             fig_tag['class'] = 'md'
         wrap(img_tag, fig_tag)
-    # sub article figure
+    
     for article_sub in soup.findAll(class_='article--sub'):
+        # sub article figure
         article_sub_id = article_sub.get('id')
         for img_tag in article_sub.findAll('img'):
             img_tag['src'] = img_tag['src'].replace(slug, article_sub_id)
+        # sub article video
+        for video_tag in article_sub.findAll('video'):
+            video_source = video_tag.find('source', type = 'video/mp4')
+            video_source['src'] = video_source['src'].replace(slug, article_sub_id)
     # links with no class = external
     for content in soup.findAll('section', {'class': 'article__content'}):
         for link in content.findAll('a', {'class': None}):
