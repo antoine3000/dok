@@ -9,6 +9,9 @@
     <meta name="description" content="{{ settings.description }}">
     <meta property="schema:name" content="{{ settings.title }}">
     <meta property="schema:description" content="{{ settings.description }}">
+    {% if settings.shop.isActive == 'True' %}
+      {{ settings.shop.header }}
+    {% endif %}
     <link rel="stylesheet" href="assets/main.min.css">
   </head>
 
@@ -23,6 +26,9 @@
             </li>
             {% endfor %}
           </ul>
+          {% if settings.shop.isActive == 'True' %}
+            {{ settings.shop.menu }}
+          {% endif %}
         </nav>
       </header>
       <!-- content -->
@@ -32,5 +38,8 @@
         {{ settings.footer }}
       </footer>
     </main>
+    {% if settings.shop.isActive == 'True' %}
+      {{ settings.shop.footer }}
+    {% endif %}
   </body>
 </html>

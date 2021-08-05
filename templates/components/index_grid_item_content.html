@@ -1,0 +1,10 @@
+<a class="item__link" href="{{ article['url'] }}">
+  {% if article['featured_image'] %}
+    <img src="medias/{{ article['slug'] }}-{{ article['featured_image'] }}" alt="{{ article['featured_desc'] }}" class="item__img" loading="lazy">
+  {% endif %}
+  <span class="item__title">{{ article['title'] }}</span>
+  {% if article['featured_desc'] %}
+    <p class="item__desc">{{ article['featured_desc'] }}</p>
+  {% endif %}
+</a>
+

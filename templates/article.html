@@ -21,10 +21,6 @@
         {% endfor %}
       </p>
     {% endif %}
-    {# featured image #}
-    {% if article['featured_image'] %}
-      <img src="{{ article['featured_image'] }}" alt="" class="article__featured">
-    {% endif %}
     {# childs #}
     {% if (open == 'False') and (article['childs_slug']|length > 0) %}
       <section class="index index--list">

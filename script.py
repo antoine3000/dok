@@ -88,7 +88,9 @@ class Article:
             'url': self.slug + '.html',
             'content': self.updated_content,
             'metadata': self.metadata,
+            'featured': self.featured,
             'featured_image': self.featured_image,
+            'featured_desc': self.featured_desc,
             'tags': self.tags,
             'parent': self.parent,
             'parent_url': self.parent + '.html',
@@ -179,9 +181,17 @@ class Article:
         except KeyError:
             self.last_update = self.publication_date
         try:
+            self.featured = eval(metadata['featured'][0])
+        except KeyError:
+            self.featured = False
+        try:
             self.featured_image = metadata['featured_image'][0]
         except KeyError:
             self.featured_image = ''
+        try:
+            self.featured_desc = metadata['featured_desc'][0]
+        except KeyError:
+            self.featured_desc = ''
         try:
             self.tags = metadata['tags'][0].split(', ')
         except KeyError:
@@ -192,19 +202,15 @@ class Article:
             self.translation = False
 
     def get_backlinks_to(self, content):
+        soup = BeautifulSoup(content, 'lxml')
+        links = soup.find_all('a')
         backlinks_to = []
-        html = content.replace('[[', '<span class="backlink">').replace(']]', '</span>')
-        soup = BeautifulSoup(html, 'lxml')
-        backlinks = soup.find_all(class_='backlink')
-        for backlink in backlinks:
-            # Add it to a list of backlinks
-            backlinks_to.append(backlink.string)
-            # Replace the span by a link
-            link_tag = soup.new_tag('a')
-            link_tag['class'] = 'internal'
-            link_tag['href'] = backlink.string + '.html'
-            link_tag.string = backlink.text
-            backlink.replaceWith(link_tag)
+        for link in links:
+            if 'http' in str(link) or 'mailto:' in str(link):
+                link['class'] = "external"
+            else:
+                backlinks_to.append(link.string)
+                link['class'] = "internal"
         self.backlinks_to = backlinks_to
         return str(soup)
 
@@ -218,19 +224,6 @@ class Article:
     def get_updated_content(self, content):
         updated_content = self.get_backlinks_to(content)
         return updated_content
-
-
-# Convert links
-def convert_links(content):
-    html = content.replace('[[', '<span class="link">').replace(']]', '</span>')
-    soup = BeautifulSoup(html, 'lxml')
-    links = soup.find_all(class_='link')
-    for link in links:
-        link_tag = soup.new_tag('a')
-        link_tag['href'] = link.string + '.html'
-        link_tag.string = link.text
-        link.replaceWith(link_tag)
-    return str(soup)
 
 
 # Medias process
@@ -356,8 +349,7 @@ for current, childs, files in os.walk(CONTENT_DIR):
 # Convert some settings to markdown
 settings_to_markdown = ['introduction', 'footer']
 for setting in settings_to_markdown:
-    setting_md = markdown.markdown(settings[setting])
-    settings[setting] = convert_links(setting_md)
+    settings[setting] = markdown.markdown(settings[setting])
 
 
 # ------------------------------------------------
