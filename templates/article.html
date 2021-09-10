@@ -28,12 +28,14 @@
           {% for article in article['childs_slug'] %}
             {% set slug = articles[article]['slug'] %}
             {% set article = articles[article] %}
+            {% if not article['draft'] %}
             <li class="index__item">
               {% include "components/index_item_content.html" %}
               {% with %}{% set childs_slug = articles[slug]['childs_slug'] %}
               {% include "components/childs_list.html" %}
               {% endwith %}
             </li>
+            {% endif %}
           {% endfor %}
         </ul>
       </section>
@@ -45,7 +47,9 @@
         {% if article['childs'] %}
           {% for child in article['childs_slug'] %}
             {% set article_child = articles[child] %}
+            {% if not article_child['draft'] %}
             <h3 class="toc__title--sub"><a href="{{ article['slug'] }}.html#{{ article_child['slug'] }}">{{ article_child['title'] }}&nbsp;↓</a></h3>
+            {% endif %}
           {% endfor %}
         {% endif %}
       </section>
@@ -101,12 +105,14 @@
               {% for child in article_child['childs_slug'] %}
                 {% set slug = articles[child]['slug'] %}
                 {% set article = articles[child] %}
+                {% if not article['draft'] %}
                 <li class="index__item">
                   {% include "components/index_item_content.html" %}
                   {% with %}{% set childs_slug = articles[slug]['childs_slug'] %}
                   {% include "components/childs_list.html" %}
                   {% endwith %}
                 </li>
+                {% endif %}
               {% endfor %}
             </ul>
           </section>
