@@ -73,7 +73,7 @@
   {% endif %}
   {# childs #}
   {% if (open == 'True') and (article['childs']) %}
-    {% for child in article['childs_slug'] if not articles[child]['draft'] %}
+    {% for child in article['childs_slug'] if not articles[child]['draft']  %}
       {% set article_child = articles[child] %}
       <article class="article--sub" id="{{ article_child['slug'] }}">
         {# title #}

@@ -67,13 +67,13 @@
   list-style: none;
   display: grid;
   grid-gap: var(--size-xl);
-  @include media('>sm') {
+  @include media('>=sm') {
     grid-template-columns: repeat(2, 1fr);
   }
-  @include media('>xl') {
+  @include media('>=md') {
     grid-template-columns: repeat(3, 1fr);
   }
-  @include media('>xxl') {
+  @include media('>=xl') {
     grid-template-columns: repeat(4, 1fr);
   }
   .item__link {
