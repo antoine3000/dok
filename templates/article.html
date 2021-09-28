@@ -90,10 +90,6 @@
             {% endfor %}
           </p>
         {% endif %}
-        {# featured image #}
-        {% if article_child['featured_image'] %}
-          <img src="{{ article_child['featured_image'] }}" alt="{{ article_child['title'] }}" class="article__featured">
-        {% endif %}
         {# content #}
         <section class="article__content ts">
           {{ article_child['content'] }}
