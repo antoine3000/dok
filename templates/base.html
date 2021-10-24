@@ -9,15 +9,15 @@
     <meta name="description" content="{{ settings.description }}">
     <meta property="schema:name" content="{{ settings.title }}">
     <meta property="schema:description" content="{{ settings.description }}">
-    {% if settings.shop.isActive == 'True' %}
-      {{ settings.shop.header }}
-    {% endif %}
     <link rel="stylesheet" href="assets/main.min.css">
     {{ settings.analytics }}
   </head>
 
-  <body class="page page--{{ page_class }}">
-    <main class="main">
+  <body>
+    {% if settings.topbar %}
+    <div class="topbar">{{ settings.topbar }}</div>
+    {% endif %}
+    <main class="main page page--{{ page_class }}">
       <header class="header">
         <nav class="nav">
           <ul class="nav__list">
@@ -27,9 +27,6 @@
             </li>
             {% endfor %}
           </ul>
-          {% if settings.shop.isActive == 'True' %}
-            {{ settings.shop.menu }}
-          {% endif %}
         </nav>
       </header>
       <!-- content -->
@@ -38,9 +35,8 @@
       <footer class="footer">
         {{ settings.footer }}
       </footer>
+      
     </main>
-    {% if settings.shop.isActive == 'True' %}
-      {{ settings.shop.footer }}
-    {% endif %}
+    <script src="/assets/js/script.js"></script>
   </body>
 </html>

@@ -1,0 +1,15 @@
+.topbar {
+  background-color: var(--base-color);
+  color: var(--body-color);
+  @extend %container-padding;
+  padding-top: var(--size-md);
+  padding-bottom: var(--size-md);
+  text-align: center;
+  a {
+    border: none;
+    padding: 0;
+    background: transparent;
+    color: var(--body-color);
+    text-decoration: underline;
+  }
+}

@@ -61,6 +61,10 @@
   .index__title {
     @extend %ts-title-0;
     margin-bottom: var(--size-xl);
+    span {
+      @extend %ts-small;
+      vertical-align: super;
+    }
   }
 }
 .grid {
@@ -72,9 +76,11 @@
   }
   @include media('>=md') {
     grid-template-columns: repeat(3, 1fr);
+    &.lg {grid-template-columns: repeat(2, 1fr);}
   }
   @include media('>=xl') {
     grid-template-columns: repeat(4, 1fr);
+    &.lg {grid-template-columns: repeat(2, 1fr);}
   }
   .item__link {
     display: block;

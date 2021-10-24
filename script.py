@@ -91,6 +91,7 @@ class Article:
             'featured': self.featured,
             'featured_image': self.featured_image,
             'featured_desc': self.featured_desc,
+            'featured_price': self.featured_price,
             'tags': self.tags,
             'parent': self.parent,
             'parent_url': self.parent + '.html',
@@ -99,6 +100,7 @@ class Article:
             'toc': self.toc,
             'publication_date': self.publication_date,
             'last_update': self.last_update,
+            'type': self.type,
             'open': self.open,
             'draft': self.draft,
             'reverse_order': self.reverse_order,
@@ -193,6 +195,10 @@ class Article:
         except KeyError:
             self.featured_desc = ''
         try:
+            self.featured_price = metadata['featured_price'][0]
+        except KeyError:
+            self.featured_price = ''
+        try:
             self.tags = metadata['tags'][0].split(', ')
         except KeyError:
             self.tags = []
@@ -200,6 +206,10 @@ class Article:
             self.translation = eval(metadata['translation'][0])
         except KeyError:
             self.translation = False
+        try:
+            self.type = metadata['type'][0]
+        except KeyError:
+            self.type = ''
 
     def get_backlinks_to(self, content):
         soup = BeautifulSoup(content, 'lxml')
@@ -347,7 +357,7 @@ for current, childs, files in os.walk(CONTENT_DIR):
             media_process(item_path, media_path)
 
 # Convert some settings to markdown
-settings_to_markdown = ['introduction', 'footer']
+settings_to_markdown = ['introduction', 'footer', 'topbar']
 for setting in settings_to_markdown:
     settings[setting] = markdown.markdown(settings[setting])
 
@@ -425,12 +435,19 @@ print(':: Content page — created')
 
 # Generate article pages
 article_template = ENV_DIR.from_string(get_template('article.html'))
+shop_template = ENV_DIR.from_string(get_template('shop.html'))
+shop_item_template = ENV_DIR.from_string(get_template('shop_item.html'))
 articles_sum = 0
 for article in articles:
     articles_sum += 1
     article_slug = articles[article]['slug']
     article_url = 'public/' + article_slug + '.html'
-    article_html = article_template.render(article=articles[article], articles=articles, settings=settings)
+    if articles[article]['type'] == 'shop':
+        article_html = shop_template.render(article=articles[article], articles=articles, settings=settings)
+    elif articles[article]['type'] == 'shop_item':
+        article_html = shop_item_template.render(article=articles[article], articles=articles, settings=settings)
+    else:
+        article_html = article_template.render(article=articles[article], articles=articles, settings=settings)
     article_html_updated = html_update(article_html, article_slug)
     with open(article_url, 'w') as file:
         file.write(article_html_updated)
@@ -467,6 +484,8 @@ FONTS_PATH_USER = 'assets/fonts/'
 IMAGES_PATH= 'assets/images/'
 FONTS_PUBLIC = 'public/assets/fonts/'
 IMAGES_PUBLIC = 'public/assets/images/'
+JS_PATH = "assets/js/"
+JS_PUBLIC = "public/assets/js/"
 
 
 def compile_scss(scss):
@@ -488,6 +507,8 @@ if not os.path.exists(FONTS_PUBLIC):
     os.makedirs(FONTS_PUBLIC)
 if not os.path.exists(IMAGES_PUBLIC):
     os.makedirs(IMAGES_PUBLIC)
+if not os.path.exists(JS_PUBLIC):
+    os.makedirs(JS_PUBLIC)
 
 # Copy fonts to public
 if os.path.isdir(FONTS_PATH_USER):
@@ -507,6 +528,13 @@ if os.path.isdir(IMAGES_PATH):
     for image_file in images:
         if not os.path.isfile(IMAGES_PUBLIC + image_file):
             shutil.copy2(IMAGES_PATH + image_file, IMAGES_PUBLIC + image_file)
+
+# Copy Js to public
+if os.path.isdir(JS_PATH):
+    js = os.listdir(JS_PATH)
+    for js_file in js:
+        if not os.path.isfile(JS_PUBLIC + js_file):
+            shutil.copy2(JS_PATH + js_file, JS_PUBLIC + js_file)
 
 # Compile, minimize css
 if os.path.isfile(SCSS_FILE):

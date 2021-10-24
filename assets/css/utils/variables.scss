@@ -32,6 +32,10 @@ $breakpoints: (
 );
 
 %container-padding {
-  padding-left: var(--size-xl);
-  padding-right: var(--size-xl);
+  padding-left: var(--size-xxl);
+  padding-right: var(--size-xxl);
+  @include media('<xs') {
+    padding-left: var(--size-xl);
+    padding-right: var(--size-xl);
+  }
 }

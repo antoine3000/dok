@@ -1,8 +1,8 @@
 // Utils
 @import "utils/reset.scss";
+@import "utils/mediaqueries.scss";
 @import "utils/fonts.scss";
 @import "utils/variables.scss";
-@import "utils/mediaqueries.scss";
 @import "utils/typography.scss";
 // Components
 @import "components/base.scss";
@@ -12,6 +12,7 @@
 @import "components/flux.scss";
 @import "components/admonition.scss";
 @import "components/embed.scss";
+@import "components/topbar.scss";
 
 html {
   font-size: 15px;
