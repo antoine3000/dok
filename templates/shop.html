@@ -8,7 +8,7 @@
   {% if (article['childs_slug']|length > 0) %}
   <section class="index index--grid">
     <ul class="grid lg">
-      {% for article in article['childs_slug'] %}
+      {% for article in article['childs_slug']|reverse %}
         {% set slug = articles[article]['slug'] %}
           {% set article = articles[slug] %}
           {% if not article['draft'] %}

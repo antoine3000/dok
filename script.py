@@ -216,11 +216,14 @@ class Article:
         links = soup.find_all('a')
         backlinks_to = []
         for link in links:
+            if link['href'].startswith('button:'):
+              link['href'] = link['href'][7:]
+              link['class'] = link.get('class', []) + ['btn']
             if 'http' in str(link) or 'mailto:' in str(link):
-                link['class'] = "external"
+                link['class'] = link.get('class', []) + ['external']
             else:
                 backlinks_to.append(link.string)
-                link['class'] = "internal"
+                link['class'] = link.get('class', []) + ['internal']
         self.backlinks_to = backlinks_to
         return str(soup)
 
@@ -278,7 +281,7 @@ def html_update(html, slug):
     html = html.replace('</table>', '</table></div>')
     html = html.replace('<a target="_blank" href="file:', file_link)
     html = html.replace('<p>TODO:', '<p class="todo">To do:')
-    html = html.replace('href="button:', 'class="btn" href="')
+    # html = html.replace('href="button:', 'class="btn" href="')
     # figure
     soup = BeautifulSoup(html, 'lxml')
     # Image slug if translation
@@ -317,10 +320,10 @@ def html_update(html, slug):
             video_source = video_tag.find('source', type = 'video/mp4')
             video_source['src'] = video_source['src'].replace(slug, article_sub_id)
     # links with no class = external
-    for content in soup.findAll('section', {'class': 'article__content'}):
-        for link in content.findAll('a', {'class': None}):
-            link['class'] = 'external'
-            link['target'] = '_blank'
+    # for content in soup.findAll('section', {'class': 'article__content'}):
+    #     for link in content.findAll('a', {'class': None}):
+    #         link['class'] = 'external'
+    #         link['target'] = '_blank'
     html = str(soup)
     html = html.replace('<p><figure', '<figure')
     html = html.replace('</img></figure></p>', '</figure>')
@@ -533,8 +536,7 @@ if os.path.isdir(IMAGES_PATH):
 if os.path.isdir(JS_PATH):
     js = os.listdir(JS_PATH)
     for js_file in js:
-        if not os.path.isfile(JS_PUBLIC + js_file):
-            shutil.copy2(JS_PATH + js_file, JS_PUBLIC + js_file)
+        shutil.copy2(JS_PATH + js_file, JS_PUBLIC + js_file)
 
 # Compile, minimize css
 if os.path.isfile(SCSS_FILE):

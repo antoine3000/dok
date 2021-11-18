@@ -2,9 +2,10 @@
   background-color: var(--base-color);
   color: var(--body-color);
   @extend %container-padding;
-  padding-top: var(--size-md);
-  padding-bottom: var(--size-md);
+  padding-top: var(--size-sm);
+  padding-bottom: var(--size-sm);
   text-align: center;
+  font-size: var(--size-md);
   a {
     border: none;
     padding: 0;
