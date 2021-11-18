@@ -281,7 +281,6 @@ def html_update(html, slug):
     html = html.replace('</table>', '</table></div>')
     html = html.replace('<a target="_blank" href="file:', file_link)
     html = html.replace('<p>TODO:', '<p class="todo">To do:')
-    # html = html.replace('href="button:', 'class="btn" href="')
     # figure
     soup = BeautifulSoup(html, 'lxml')
     # Image slug if translation
@@ -319,11 +318,10 @@ def html_update(html, slug):
         for video_tag in article_sub.findAll('video'):
             video_source = video_tag.find('source', type = 'video/mp4')
             video_source['src'] = video_source['src'].replace(slug, article_sub_id)
-    # links with no class = external
-    # for content in soup.findAll('section', {'class': 'article__content'}):
-    #     for link in content.findAll('a', {'class': None}):
-    #         link['class'] = 'external'
-    #         link['target'] = '_blank'
+    # external links target blank
+    for content in soup.findAll('section', {'class': 'article__content'}):
+        for link in content.findAll('a', {'class': 'external'}):
+            link['target'] = '_blank'
     html = str(soup)
     html = html.replace('<p><figure', '<figure')
     html = html.replace('</img></figure></p>', '</figure>')
