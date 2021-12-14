@@ -3,7 +3,11 @@
     <img src="medias/{{ article['slug'] }}-{{ article['featured_image'] }}" alt="{{ article['featured_desc'] }}" class="item__img" loading="lazy">
   {% endif %}
   <span class="item__title">{{ article['title'] }}</span>
-  <div class="item__price">€{{ article['featured_price'] }} EUR</div>
+  {% if article['status'] == 'soldout' %}
+      <div class="item__price"><span style="text-decoration: line-through;">€{{ article['featured_price'] }} EUR</span>  ✘ Sold out</div>
+    {% else %}
+      <div class="item__price">€{{ article['featured_price'] }} EUR</div>
+    {% endif %}
   {% if article['featured_desc'] %}
     <p class="item__desc">{{ article['featured_desc'] }}</p>
   {% endif %}

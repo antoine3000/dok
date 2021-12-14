@@ -103,6 +103,7 @@ class Article:
             'type': self.type,
             'open': self.open,
             'draft': self.draft,
+            'status': self.status,
             'reverse_order': self.reverse_order,
             'no_interface': self.no_interface,
             'has_parent': self.has_parent,
@@ -170,6 +171,10 @@ class Article:
             self.draft = eval(metadata['draft'][0])
         except KeyError:
             self.draft = False
+        try:
+            self.status = metadata['status'][0]
+        except KeyError:
+            self.status = ''
         try:
             self.reverse_order = eval(metadata['reverse_order'][0])
         except KeyError:

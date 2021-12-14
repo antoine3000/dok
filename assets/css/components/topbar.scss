@@ -5,7 +5,9 @@
   padding-top: var(--size-sm);
   padding-bottom: var(--size-sm);
   text-align: center;
-  font-size: var(--size-md);
+  font-size: var(--size-sm);
+  position: relative;
+  z-index: 3;
   a {
     border: none;
     padding: 0;
