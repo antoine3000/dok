@@ -17,10 +17,8 @@
   .nav {
     padding-top: var(--size-md);
     padding-bottom: var(--size-xl);
-    width: 100%;
-    overflow: hidden;
   }
-  // @extend %container-padding;
+  @extend %container-padding;
   .title {
     margin-right: var(--size-sm);
   }
@@ -30,31 +28,12 @@
 .nav__list {
   list-style: none;
   display: flex;
-  flex-wrap: nowrap;
-  overflow-x: scroll;
 }
 .nav__item {
   display: block;
-  &:first-child {
-    padding-left: var(--size-xxl);
-    @include media('<xs') {
-      padding-left: var(--size-xl);
-    }
-  }
-  &:last-child {
-    padding-right: var(--size-xxl);
-    @include media('<xs') {
-      padding-right: var(--size-xl);
-    }
-  }
   &:not(:last-child) {
     margin-right: var(--size-sm);
-    @include media('<sm') {
-      margin-right: var(--size-xs);
-    }
   }
-  margin-top: var(--size-xs);
-  margin-bottom: var(--size-xs);
 }
 
 // Footer

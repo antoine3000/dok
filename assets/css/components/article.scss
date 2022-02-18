@@ -11,16 +11,10 @@
     color: var(--base-color);
     text-decoration: none;
   }
-  & + .article__content {
-    margin-top: var(--size-md);
-  }
-  .article--sub & {
-    @extend %ts-title-1;
-  }
 }
 .article__content {
   margin-top: var(--size-md);
-  & > *:not(.lg):not(pre):not(.embed-container):not(video) {
+  & > *:not(.lg):not(pre):not(.embed-container) {
     max-width: var(--content-max-width);
   }
 }
@@ -78,36 +72,14 @@
 }
 .article figure.sm {
   max-width: 100%;
-  width: calc(50% - var(--size-sm));
-  &:nth-child(odd) {
-    margin-right: var(--size-sm);
-  }
-  img {
-    width: 100%;
-    margin: 0;
+  width: 100%;
+  @include media('>sm') {
+    width: calc(#{var(--content-max-width)}/2 - #{var(--size-sm)}/2);
+    margin-right: var(--size-sm)/2;
   }
   display: inline-block;
   vertical-align: top;
   margin-bottom: var(--size-md);
-}
-
-// List
-.ts ul {
-  list-style: none;
-  padding: 0;
-  li {
-    padding-left: var(--size-md);
-    position: relative;
-    &:before {
-      content: "-";
-      position: absolute;
-      left: 0;
-      top: 0.1em;
-    }
-  }
-  ul {
-    margin-bottom: 0;
-  }
 }
 
 // Article sub
@@ -133,12 +105,15 @@
 // Button
 .ts .btn {
   display: inline-block;
-  padding: var(--size-xs);
+  background-color: var(--action-color);
+  color: var(--base-color);
+  padding: var(--size-lg);
+  border: var(--border-sm) solid var(--base-color);
 }
 
 // Video
 .ts video {
-  max-width: auto;
+  max-width: 100%;
   width: 100%;
   display: block;
 }
@@ -156,16 +131,4 @@
     width: 100%;
     height: 100%;
   }
-}
-
-// Backlinks
-.article__backlinks {
-  border-top: var(--border-sm) dashed var(--base-color);
-  // border-bottom: var(--border-sm) dashed var(--base-color);
-  margin-top: var(--size-xl);
-}
-
-// journal
-#journal .article__title {
-  margin-bottom: var(--size-xxl);
 }

@@ -1,12 +1,12 @@
-{% extends "base.html" %} {% set page_class = 'homepage' %} {% block content %}
+{% extends "base.html" %} {% set page_class = 'shop' %} {% block content %}
 
 <section class="heading">
-  <h1 class="page__title">{{ settings.introductions.homepage }}</h1>
+  <h1 class="page__title">{{ settings.introductions.shop }}</h1>
 </section>
 
 <section class="index">
   <ul class="grid grid--lg">
-    {% for article in settings.index %}
+    {% for article in settings.shop %}
     {% set slug = article %}
     {% set article = articles[article] %}
     <li class="grid__item">
@@ -15,8 +15,8 @@
         <img src="medias/{{ article['slug'] }}-{{ article['featured_image'] }}" alt="{{ article['featured_desc'] }}" class="item__img" loading="lazy">
         {% endif %}
         <h2 class="item__title">{{ article['title'] }}</h2>
-        {% if article['featured_desc'] %}
-        <p class="item__desc">{{ article['featured_desc'] }}</p>
+        {% if article['price'] %}
+        <p class="item__price">{{ article['price'] }}</p>
         {% endif %}
         {% if article['action'] %}
         <span class="item__desc">{{ article['action'] }}</span>

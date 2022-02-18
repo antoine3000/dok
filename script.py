@@ -2,7 +2,7 @@ import os
 import sys
 import shutil
 import traceback
-from jinja2 import Template, Environment, FileSystemLoader, BaseLoader
+from jinja2 import Environment, FileSystemLoader
 import markdown
 from PIL import Image
 from bs4 import BeautifulSoup
@@ -10,12 +10,12 @@ from datetime import datetime
 import yaml
 import rcssmin
 import sass
-from feedgen.feed import FeedGenerator
 
 CONTENT_DIR = 'content'
 PUBLIC_DIR = 'public'
 MEDIAS_DIR = 'public/medias'
-ENV_DIR = Environment(loader=FileSystemLoader('dok/templates'))
+TEMPLATES_DIR = "dok/templates"
+ENV_DIR = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
 IMG_MAX_WIDTH = 1400
 
 
@@ -88,24 +88,18 @@ class Article:
             'url': self.slug + '.html',
             'content': self.updated_content,
             'metadata': self.metadata,
-            'featured': self.featured,
             'featured_image': self.featured_image,
-            'featured_desc': self.featured_desc,
-            'featured_price': self.featured_price,
+            'action': self.action,
+            'template': self.template,
             'tags': self.tags,
             'parent': self.parent,
             'parent_url': self.parent + '.html',
             'title': self.title,
-            'translation': self.translation,
             'toc': self.toc,
             'publication_date': self.publication_date,
             'last_update': self.last_update,
-            'type': self.type,
             'open': self.open,
-            'draft': self.draft,
-            'status': self.status,
             'reverse_order': self.reverse_order,
-            'no_interface': self.no_interface,
             'has_parent': self.has_parent,
             'backlinks_to': self.backlinks_to,
             'backlinks_from': self.backlinks_from
@@ -122,8 +116,7 @@ class Article:
             print('☹  "' + self.name + '" must be renamed to start with a date (DD-MM-YYYY-) ☹')
             sys.exit()
         # slug
-        slug_text = self.name[11:] if len(self.name) > 11 else self.name
-        slug = slug_text.strip()
+        slug = self.name[11:] if len(self.name) > 11 else self.name
         if not slug in slug_list:
             slug_list.append(slug)
         else:
@@ -168,67 +161,44 @@ class Article:
         except KeyError:
             self.open = False
         try:
-            self.draft = eval(metadata['draft'][0])
-        except KeyError:
-            self.draft = False
-        try:
-            self.status = metadata['status'][0]
-        except KeyError:
-            self.status = ''
-        try:
             self.reverse_order = eval(metadata['reverse_order'][0])
         except KeyError:
             self.reverse_order = False
-        try:
-            self.no_interface = eval(metadata['no_interface'][0])
-        except KeyError:
-            self.no_interface = False
         try:
             self.last_update = datetime.strptime(metadata['last_update'][0], '%Y-%m-%d').strftime('%d/%m/%Y')
         except KeyError:
             self.last_update = self.publication_date
         try:
-            self.featured = eval(metadata['featured'][0])
-        except KeyError:
-            self.featured = False
-        try:
             self.featured_image = metadata['featured_image'][0]
         except KeyError:
             self.featured_image = ''
         try:
-            self.featured_desc = metadata['featured_desc'][0]
+            self.action = metadata['action'][0]
         except KeyError:
-            self.featured_desc = ''
+            self.action = ''
         try:
-            self.featured_price = metadata['featured_price'][0]
+            self.template = metadata['template'][0]
         except KeyError:
-            self.featured_price = ''
+            self.template = 'article'
         try:
             self.tags = metadata['tags'][0].split(', ')
         except KeyError:
             self.tags = []
-        try:
-            self.translation = eval(metadata['translation'][0])
-        except KeyError:
-            self.translation = False
-        try:
-            self.type = metadata['type'][0]
-        except KeyError:
-            self.type = ''
 
     def get_backlinks_to(self, content):
-        soup = BeautifulSoup(content, 'lxml')
-        links = soup.find_all('a')
         backlinks_to = []
-        for link in links:
-            if link['href'].startswith('button:'):
-              link['href'] = link['href'][7:]
-              link['class'] = link.get('class', []) + ['btn']
-            if 'http' in str(link) or 'mailto:' in str(link):
-                link['class'] = link.get('class', []) + ['external']
-            else:
-                backlinks_to.append(link.string)
-                link['class'] = link.get('class', []) + ['internal']
+        html = content.replace('[[', '<span class="backlink">').replace(']]', '</span>')
+        soup = BeautifulSoup(html, 'lxml')
+        backlinks = soup.find_all(class_='backlink')
+        for backlink in backlinks:
+            # Add it to a list of backlinks
+            backlinks_to.append(backlink.string)
+            # Replace the span by a link
+            link_tag = soup.new_tag('a')
+            link_tag['class'] = 'internal'
+            link_tag['href'] = backlink.string + '.html'
+            link_tag.string = backlink.text
+            backlink.replaceWith(link_tag)
         self.backlinks_to = backlinks_to
         return str(soup)
 
@@ -244,6 +214,19 @@ class Article:
         return updated_content
 
 
+# Convert links
+def convert_links(content):
+    html = content.replace('[[', '<span class="link">').replace(']]', '</span>')
+    soup = BeautifulSoup(html, 'lxml')
+    links = soup.find_all(class_='link')
+    for link in links:
+        link_tag = soup.new_tag('a')
+        link_tag['href'] = link.string + '.html'
+        link_tag.string = link.text
+        link.replaceWith(link_tag)
+    return str(soup)
+
+
 # Medias process
 if not os.path.exists(MEDIAS_DIR):
     os.makedirs(MEDIAS_DIR)
@@ -255,7 +238,7 @@ def media_process(origin, destination):
         if destination.endswith(tuple(['jpg', 'jpeg', 'png', 'JPG', 'JPEG'])):
             img = Image.open(destination)
             if img.mode in ('RGBA', 'LA'):
-                background = Image.new(img.mode[:-1], img.size, '#f6f4f2')
+                background = Image.new(img.mode[:-1], img.size, '#FFFFFF')
                 background.paste(img, img.split()[-1])
                 img = background
             wpercent = (IMG_MAX_WIDTH/float(img.size[0]))
@@ -270,9 +253,7 @@ def wrap(to_wrap, wrap_in):
 
 
 def slugify(path):
-    path_clean = os.path.basename(os.path.normpath(path))
-    slug_text = path_clean[11:] if len(path_clean) >= 11 else path_clean
-    slug = slug_text.strip()
+    slug = os.path.basename(os.path.normpath(path))[11:] if len(path) >= 11 else path
     return slug
 
 
@@ -286,23 +267,16 @@ def html_update(html, slug):
     html = html.replace('</table>', '</table></div>')
     html = html.replace('<a target="_blank" href="file:', file_link)
     html = html.replace('<p>TODO:', '<p class="todo">To do:')
+    html = html.replace('href="button:', 'class="btn" href="')
     # figure
     soup = BeautifulSoup(html, 'lxml')
-    # Image slug if translation
-    image_slug = article_slug
-    try:
-        parent = articles[slug]['parent']
-        if articles[parent]['translation']:
-            image_slug = parent
-    except KeyError:
-        pass
     for img_tag in soup.findAll('img'):
         caption = soup.new_tag('figcaption')
         caption.append(img_tag['alt'])
         img_tag.append(caption)
         img_tag['loading'] = 'lazy'
         fig_tag = soup.new_tag("figure")
-        img_tag['src'] = 'medias/' + image_slug + '-' + img_tag['src']
+        img_tag['src'] = 'medias/' + article_slug + '-' + img_tag['src']
         img_src = img_tag['src']
         if "large:" in img_src:
             fig_tag['class'] = 'lg'
@@ -313,19 +287,15 @@ def html_update(html, slug):
         else:
             fig_tag['class'] = 'md'
         wrap(img_tag, fig_tag)
-    
+    # sub article figure
     for article_sub in soup.findAll(class_='article--sub'):
-        # sub article figure
         article_sub_id = article_sub.get('id')
         for img_tag in article_sub.findAll('img'):
             img_tag['src'] = img_tag['src'].replace(slug, article_sub_id)
-        # sub article video
-        for video_tag in article_sub.findAll('video'):
-            video_source = video_tag.find('source', type = 'video/mp4')
-            video_source['src'] = video_source['src'].replace(slug, article_sub_id)
-    # external links target blank
+    # links with no class = external
     for content in soup.findAll('section', {'class': 'article__content'}):
-        for link in content.findAll('a', {'class': 'external'}):
+        for link in content.findAll('a', {'class': None}):
+            link['class'] = 'external'
             link['target'] = '_blank'
     html = str(soup)
     html = html.replace('<p><figure', '<figure')
@@ -347,15 +317,12 @@ except FileNotFoundError:
 # Loop through every folder in content and add the objects to a list
 articles_list = []
 slug_list = []
-
 for current, childs, files in os.walk(CONTENT_DIR):
     # Loop through every files in folder
     for file in files:
         if str(file) == '_index.md':
             # Save this folder as an article
             articles_list.append(Article(path=current, markdown=file, childs=childs))
-        elif str(file) == '.DS_Store':
-            os.remove(current + '/' + file)
         elif not os.path.isdir(file):
             item_slug = slugify(current)
             item_path = current + '/' + file
@@ -363,9 +330,11 @@ for current, childs, files in os.walk(CONTENT_DIR):
             media_process(item_path, media_path)
 
 # Convert some settings to markdown
-settings_to_markdown = ['introduction', 'footer', 'topbar']
+settings_to_markdown = ['introduction', 'footer']
 for setting in settings_to_markdown:
-    settings[setting] = markdown.markdown(settings[setting])
+    if setting in settings:
+        setting_md = markdown.markdown(settings[setting])
+        settings[setting] = convert_links(setting_md)
 
 
 # ------------------------------------------------
@@ -403,14 +372,8 @@ for article in sorted_articles_list:
 # Site generation
 # ------------------------------------------------
 
-def get_template(template):
-    if os.path.isfile('templates/' + template):
-        template_file = open('templates/' + template, 'r').read()
-    else:
-        template_file = open('dok/templates/' + template, 'r').read()
-    return template_file
-
-pages_sum = 0
+index_sum, articles_sum = 0, 0
+templates = os.listdir(TEMPLATES_DIR)
 
 # Make directories if they don't exist
 if not os.path.exists(PUBLIC_DIR):
@@ -423,60 +386,36 @@ for item in public_items:
         os.remove(PUBLIC_DIR + '/' + item)
 print(':: Public folder — cleaned')
 
-# Generate index page
-index_template = ENV_DIR.from_string(get_template('index.html'))
-index_html = index_template.render(articles=articles, settings=settings)
-with open('public/index.html', 'w') as file:
-    file.write(index_html)
-pages_sum += 1
-print(':: Index page — created')
-
-# Generate content page
-content_template = ENV_DIR.from_string(get_template('content.html'))
-content_html = content_template.render(articles=articles, settings=settings)
-with open('public/content.html', 'w') as file:
-    file.write(content_html)
-pages_sum += 1
-print(':: Content page — created')
-
 # Generate article pages
-article_template = ENV_DIR.from_string(get_template('article.html'))
-shop_template = ENV_DIR.from_string(get_template('shop.html'))
-shop_item_template = ENV_DIR.from_string(get_template('shop_item.html'))
-articles_sum = 0
 for article in articles:
-    articles_sum += 1
+    article_meta_template = str(articles[article]['template'] + '.html')
+    template = article_meta_template if article_meta_template in templates else 'article.html'
+    article_template = ENV_DIR.get_template(template)
     article_slug = articles[article]['slug']
     article_url = 'public/' + article_slug + '.html'
-    if articles[article]['type'] == 'shop':
-        article_html = shop_template.render(article=articles[article], articles=articles, settings=settings)
-    elif articles[article]['type'] == 'shop_item':
-        article_html = shop_item_template.render(article=articles[article], articles=articles, settings=settings)
-    else:
-        article_html = article_template.render(article=articles[article], articles=articles, settings=settings)
+    article_html = article_template.render(article=articles[article], articles=articles, settings=settings)
     article_html_updated = html_update(article_html, article_slug)
     with open(article_url, 'w') as file:
         file.write(article_html_updated)
+    articles_sum += 1
 print(':: Article pages — created (' + str(articles_sum) + ')')
 
-# Generate tag pages
-tag_template = ENV_DIR.from_string(get_template('tag.html'))
-tags_sum = 0
-for tag in tags:
-    tags_sum += 1
-    tag_url = 'public/tag-' + tag + '.html'
-    tag_html = tag_template.render(
-        title=tag, articles=tags[tag], settings=settings)
-    with open(tag_url, 'w') as file:
-        file.write(tag_html)
 
-print(':: Tag pages — created (' + str(tags_sum) + ')')
+# Generate index pages
+for template in templates:
+    if template[:5] == "index":
+        index_template = ENV_DIR.get_template(template)
+        index_html = index_template.render(articles=articles, settings=settings)
+        template_slug = str(template[6:]) if template != "index.html" else str(template)
+        with open('public/' + template_slug, 'w') as file:
+            file.write(index_html)
+        index_sum += 1
+print(':: Index pages — created (' + str(index_sum) + ')')
 
 
 # ------------------------------------------------
 # Assets
 # ------------------------------------------------
-
 
 if not os.path.exists('assets'):
     SCSS_FILE = "dok/assets/css/main.scss"
@@ -487,11 +426,7 @@ SCSS_MAP = {SCSS_FILE: "public/assets/main.css"}
 CSS_MAP = {"public/assets/main.css": "public/assets/main.min.css"}
 FONTS_PATH_DOK = 'dok/assets/fonts/'
 FONTS_PATH_USER = 'assets/fonts/'
-IMAGES_PATH= 'assets/images/'
 FONTS_PUBLIC = 'public/assets/fonts/'
-IMAGES_PUBLIC = 'public/assets/images/'
-JS_PATH = "assets/js/"
-JS_PUBLIC = "public/assets/js/"
 
 
 def compile_scss(scss):
@@ -508,13 +443,9 @@ def minify_css(css):
                 outfile.write(rcssmin.cssmin(infile.read()))
 
 
-# Create directories if they don't exist yet
+# Create fonts directory if it doesn't exist yet
 if not os.path.exists(FONTS_PUBLIC):
     os.makedirs(FONTS_PUBLIC)
-if not os.path.exists(IMAGES_PUBLIC):
-    os.makedirs(IMAGES_PUBLIC)
-if not os.path.exists(JS_PUBLIC):
-    os.makedirs(JS_PUBLIC)
 
 # Copy fonts to public
 if os.path.isdir(FONTS_PATH_USER):
@@ -528,19 +459,6 @@ if os.path.isdir(fonts_path):
         if not os.path.isfile(FONTS_PUBLIC + font_file):
             shutil.copy2(fonts_path + font_file, FONTS_PUBLIC + font_file)
 
-# Copy images to public
-if os.path.isdir(IMAGES_PATH):
-    images = os.listdir(IMAGES_PATH)
-    for image_file in images:
-        if not os.path.isfile(IMAGES_PUBLIC + image_file):
-            shutil.copy2(IMAGES_PATH + image_file, IMAGES_PUBLIC + image_file)
-
-# Copy Js to public
-if os.path.isdir(JS_PATH):
-    js = os.listdir(JS_PATH)
-    for js_file in js:
-        shutil.copy2(JS_PATH + js_file, JS_PUBLIC + js_file)
-
 # Compile, minimize css
 if os.path.isfile(SCSS_FILE):
     compile_scss(SCSS_MAP)
@@ -549,37 +467,11 @@ if os.path.isfile(SCSS_FILE):
 
 
 # ------------------------------------------------
-# RSS feed
-# ------------------------------------------------
-
-fg = FeedGenerator()
-fg.title(settings['title'])
-fg.author({'name': settings['title']})
-fg.link(href=settings['main_url'], rel='alternate')
-fg.subtitle(settings['description'])
-fg.language(settings['language'])
-rssfeed = fg.rss_str(pretty=True)
-
-for article in articles:
-    date = articles[article]["last_update"] if articles[article]["last_update"] else articles[article]["publication_date"]
-    if not articles[article]["draft"] and articles[article]["content"]:
-        fe = fg.add_entry()
-        fe.title(articles[article]["title"])
-        fe.link(href=settings['main_url'] + '/' + articles[article]["slug"] + '.html')
-        fe.author({'name': settings['title']})
-        fe.description(articles[article]["content"][:1800] + '...')
-        fe.pubDate(datetime.strptime(date, '%d/%m/%Y').strftime('%a %b %d %H:%M:%S %Y') + ' +0200')
-fg.rss_file('public/rss.xml')
-print(":: RSS feed — updated")
-
-
-
-# ------------------------------------------------
 # End
 # ------------------------------------------------
 
+pages_sum = index_sum + articles_sum
 line()
-pages_sum = pages_sum + articles_sum + tags_sum
 print(':: Dok has ' + str(pages_sum) + ' pages')
 line()
 print('Copy/paste this path in your web browser to visit your freshly generated website:')

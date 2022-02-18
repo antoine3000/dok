@@ -1,9 +1,0 @@
-<a class="index__link" href="{{ article['url'] }}">{{ article['title'] }}</a>
-<span class="index__update">{{ article['publication_date'] }}</span>
-{% if article['tags'] %}
-<span class="index__tags">
-  {% for tag in article['tags'] %}
-  <a href="tag-{{ tag }}.html" class="tags__link">#{{ tag }}</a>
-  {% endfor %}
-</span>
-{% endif %}
