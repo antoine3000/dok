@@ -487,7 +487,6 @@ print(':: Tag pages — created (' + str(tags_sum) + ')')
 
 # Generate Flux page
 flux_metadata = [flux[item] for item in flux]
-flux_metadata.reverse()
 flux_template = ENV_DIR.from_string(get_template('flux.html'))
 flux_html = flux_template.render(articles=flux_metadata, settings=settings)
 flux_slug = settings['flux']['slug']
