@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% set page_class = 'flux' %}
+
+{% block content %}
+<section class="index index--grid">
+  <h1 class="index__title">Flux</h1>
+  <ul class="index__list">
+    {% for article in articles %}
+    <li class="index__item">
+      <figure class="index__figure">
+        <img src="{{ article.image }}" alt="{{ article.container }}" loading="lazy">
+        <figcaption>Seen in: <a href="{{ article.link }}.html">{{ article.container[0] }}</a></figcaption>
+      </figure>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

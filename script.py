@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import os
 import sys
 import shutil
@@ -222,8 +224,11 @@ class Article:
         backlinks_to = []
         for link in links:
             if link['href'].startswith('button:'):
-              link['href'] = link['href'][7:]
-              link['class'] = link.get('class', []) + ['btn']
+                link['href'] = link['href'][7:]
+                link['class'] = link.get('class', []) + ['btn']
+            if link['href'].startswith('file:'):
+                link['href'] = 'medias/' + self.slug + '-' + link['href'][5:]
+                link['class'] = link.get('class', []) + ['btn']
             if 'http' in str(link) or 'mailto:' in str(link):
                 link['class'] = link.get('class', []) + ['external']
             else:
@@ -275,17 +280,24 @@ def slugify(path):
     slug = slug_text.strip()
     return slug
 
+def image_flux(image, slug):
+    container = articles[slug]['metadata']['title']
+    if (os.path.isfile('public/' + image)) and (not image in flux):
+        flux[image] = {}
+        flux[image]['image'] = image
+        flux[image]['link'] = slug
+        flux[image]['container'] = container
+
 
 def html_update(html, slug):
     video_tag = '<video controls preload="auto"><source type ="video/mp4" src ="medias/' + slug + '-'
-    file_link = '<a target="_blank" class="link-file" href="medias/' + slug + '-'
     html = html.replace('<video><source src="', video_tag)
     html = html.replace('<p><video', '<video')
     html = html.replace('</video></p>', '</video>')
     html = html.replace('<table>', '<div class="table"><table>')
     html = html.replace('</table>', '</table></div>')
-    html = html.replace('<a target="_blank" href="file:', file_link)
     html = html.replace('<p>TODO:', '<p class="todo">To do:')
+    html = html.replace('href="button:', 'class="btn" href="')
     # figure
     soup = BeautifulSoup(html, 'lxml')
     # Image slug if translation
@@ -312,6 +324,9 @@ def html_update(html, slug):
             img_tag['src'] = img_src.replace('small:', '')
         else:
             fig_tag['class'] = 'md'
+        if ":flux" in img_src:
+            img_tag['src'] = img_tag['src'].replace(':flux', '')
+            image_flux(str(img_tag['src']), slug)
         wrap(img_tag, fig_tag)
     
     for article_sub in soup.findAll(class_='article--sub'):
@@ -323,6 +338,9 @@ def html_update(html, slug):
         for video_tag in article_sub.findAll('video'):
             video_source = video_tag.find('source', type = 'video/mp4')
             video_source['src'] = video_source['src'].replace(slug, article_sub_id)
+        # sub article link
+        for article_file in article_sub.findAll('.link-file'):
+            article_file['href'] = article_file['href'].replace('medias/' + slug, 'medias/' + article_sub_slug)
     # external links target blank
     for content in soup.findAll('section', {'class': 'article__content'}):
         for link in content.findAll('a', {'class': 'external'}):
@@ -365,7 +383,8 @@ for current, childs, files in os.walk(CONTENT_DIR):
 # Convert some settings to markdown
 settings_to_markdown = ['introduction', 'footer', 'topbar']
 for setting in settings_to_markdown:
-    settings[setting] = markdown.markdown(settings[setting])
+    if setting in settings:
+        settings[setting] = markdown.markdown(settings[setting])
 
 
 # ------------------------------------------------
@@ -374,9 +393,11 @@ for setting in settings_to_markdown:
 
 articles = {}
 tags = {}
+flux = {}
 
 # Reorder main articles list
 sorted_articles_list = sorted(articles_list, key=lambda x: x.name)
+sorted_articles_list.reverse()
 
 for article in sorted_articles_list:
     # Reorder childs slug list
@@ -397,7 +418,6 @@ for article in sorted_articles_list:
         if not tag in tags:
             tags[tag] = []
         tags[tag].append(article.asdict())
-
 
 # ------------------------------------------------
 # Site generation
@@ -441,19 +461,12 @@ print(':: Content page — created')
 
 # Generate article pages
 article_template = ENV_DIR.from_string(get_template('article.html'))
-shop_template = ENV_DIR.from_string(get_template('shop.html'))
-shop_item_template = ENV_DIR.from_string(get_template('shop_item.html'))
 articles_sum = 0
 for article in articles:
     articles_sum += 1
     article_slug = articles[article]['slug']
     article_url = 'public/' + article_slug + '.html'
-    if articles[article]['type'] == 'shop':
-        article_html = shop_template.render(article=articles[article], articles=articles, settings=settings)
-    elif articles[article]['type'] == 'shop_item':
-        article_html = shop_item_template.render(article=articles[article], articles=articles, settings=settings)
-    else:
-        article_html = article_template.render(article=articles[article], articles=articles, settings=settings)
+    article_html = article_template.render(article=articles[article], articles=articles, settings=settings)
     article_html_updated = html_update(article_html, article_slug)
     with open(article_url, 'w') as file:
         file.write(article_html_updated)
@@ -471,6 +484,19 @@ for tag in tags:
         file.write(tag_html)
 
 print(':: Tag pages — created (' + str(tags_sum) + ')')
+
+# Generate Flux page
+flux_metadata = [flux[item] for item in flux]
+flux_metadata.reverse()
+flux_template = ENV_DIR.from_string(get_template('flux.html'))
+flux_html = flux_template.render(articles=flux_metadata, settings=settings)
+flux_slug = settings['flux']['slug']
+articles_sum += 1
+with open('public/' + flux_slug + '.html', 'w') as file:
+    file.write(flux_html)
+print("⁂  " + flux_slug + ": Created")
+print(':: Flux page — created')
+
 
 
 # ------------------------------------------------

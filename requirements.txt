@@ -1,6 +1,6 @@
 bs4
 feedgen
-Jinja2
+jinja2
 libsass
 lxml
 Markdown

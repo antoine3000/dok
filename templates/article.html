@@ -81,7 +81,7 @@
       {% set article_child = articles[child] %}
       <article class="article--sub" id="{{ article_child['slug'] }}">
         {# title #}
-        <h1 class="article__title">{{ article_child['title'] }}&nbsp;<a href="{{ article_child['slug'] }}.html">➹</a></h1>
+        <h1 class="article__title">{{ article_child['title'] }}&nbsp;<a href="{{ article_child['slug'] }}.html">●</a></h1>
         {# tags #}
         {% if article_child['tags'] %}
           <p class="article__tags">Tags:
