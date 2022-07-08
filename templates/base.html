@@ -10,14 +10,10 @@
     <meta property="schema:name" content="{{ settings.title }}">
     <meta property="schema:description" content="{{ settings.description }}">
     <link rel="stylesheet" href="assets/main.min.css">
-    {{ settings.analytics }}
   </head>
 
-  <body>
-    {% if settings.topbar %}
-    <div class="topbar">{{ settings.topbar }}</div>
-    {% endif %}
-    <main class="main page page--{{ page_class }}">
+  <body class="page page--{{ page_class }}">
+    <main class="main">
       <header class="header">
         <nav class="nav">
           <ul class="nav__list">
@@ -35,8 +31,6 @@
       <footer class="footer">
         {{ settings.footer }}
       </footer>
-      
     </main>
-    <script src="assets/js/scripts.js"></script>
   </body>
 </html>

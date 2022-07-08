@@ -44,9 +44,6 @@
   @extend %font-body-bold;
   font-size: var(--size-xxl);
   line-height: 1.2;
-  @include media('<xs') {
-    font-size: calc(var(--size-xxl)/4*3);
-  }
 }
 %ts-title-1 {
   @extend %font-body-bold;
@@ -84,18 +81,18 @@ a {
   h3 {@extend %ts-title-3;}
   h4, h5, h6 {@extend %ts-title-4;}
   h1, h2, h3, h4, h5, h6 {
-    margin: 1.5em 0 0.75em 0;
+    margin: 1em 0 0.5em 0;
   }
   p, ul, ol, .table, .admonition, pre {
     margin-bottom: 1em;
   }
   figure.md, figure.lg, video, .embed-container {
-    margin:  1.5em 0;
+    margin:  2em 0;
     & + figure.md,
     & + figure.lg,
     & + .embed-container,
     & + video {
-      margin-top: -0.75em;
+      margin-top: -1em;
     }
   }
   p + p {
@@ -103,7 +100,7 @@ a {
   }
   p.todo,
   blockquote {
-    margin: 1.5em 0;
+    margin: 2em 0;
   }
   ul {
     padding-left: 1em;
