@@ -101,6 +101,7 @@ class Article:
             'publication_date': self.publication_date,
             'last_update': self.last_update,
             'open': self.open,
+            'content_first': self.content_first,
             'reverse_order': self.reverse_order,
             'has_parent': self.has_parent,
             'backlinks_to': self.backlinks_to,
@@ -162,6 +163,10 @@ class Article:
             self.open = eval(metadata['open'][0])
         except KeyError:
             self.open = False
+        try:
+            self.content_first = eval(metadata['content_first'][0])
+        except KeyError:
+            self.content_first = False
         try:
             self.reverse_order = eval(metadata['reverse_order'][0])
         except KeyError:

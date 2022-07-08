@@ -23,6 +23,11 @@
     {% endif %}
     {# childs #}
     {% if (open == 'False') and (article['childs_slug']|length > 0) %}
+      {% if (article['content_first'] == True) %}
+      <section id="content" class="article__content ts">
+        {{ article['content'] }}
+      </section>
+      {% endif %}
       <section class="index index--list">
         <ul class="index__list">
           {% for article in article['childs_slug'] %}
@@ -56,9 +61,11 @@
       {% endif %}
     {% endif %}
     {# content #}
+    {% if (article['content_first'] == False) %}
     <section id="content" class="article__content ts">
       {{ article['content'] }}
     </section>
+    {% endif %}
     <footer>
       <p>✎ <span>Created</span> {{ article['publication_date'] }}</p>
       <p>⁂ <span>Updated</span> {{ article['last_update'] }}</p>
