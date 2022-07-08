@@ -12,6 +12,8 @@ from datetime import datetime
 import yaml
 import rcssmin
 import sass
+from feedgen.feed import FeedGenerator
+from collections import OrderedDict
 
 CONTENT_DIR = 'content'
 PUBLIC_DIR = 'public'
@@ -101,6 +103,7 @@ class Article:
             'publication_date': self.publication_date,
             'last_update': self.last_update,
             'open': self.open,
+            'draft': self.draft,
             'content_first': self.content_first,
             'reverse_order': self.reverse_order,
             'has_parent': self.has_parent,
@@ -163,6 +166,10 @@ class Article:
             self.open = eval(metadata['open'][0])
         except KeyError:
             self.open = False
+        try:
+            self.draft = eval(metadata['draft'][0])
+        except KeyError:
+            self.draft = False
         try:
             self.content_first = eval(metadata['content_first'][0])
         except KeyError:
@@ -422,16 +429,17 @@ print(':: Public folder — cleaned')
 article_template = ENV_DIR.from_string(get_template('article.html'))
 articles_sum = 0
 for article in articles:
-    article_meta_template = str(articles[article]['template'] + '.html')
-    template = article_meta_template if article_meta_template in templates else 'article.html'
-    article_template = ENV_DIR.get_template(template)
-    article_slug = articles[article]['slug']
-    article_url = 'public/' + article_slug + '.html'
-    article_html = article_template.render(article=articles[article], articles=articles, settings=settings)
-    article_html_updated = html_update(article_html, article_slug)
-    with open(article_url, 'w') as file:
-        file.write(article_html_updated)
-    articles_sum += 1
+    if not articles[article]["draft"]:
+        article_meta_template = str(articles[article]['template'] + '.html')
+        template = article_meta_template if article_meta_template in templates else 'article.html'
+        article_template = ENV_DIR.get_template(template)
+        article_slug = articles[article]['slug']
+        article_url = 'public/' + article_slug + '.html'
+        article_html = article_template.render(article=articles[article], articles=articles, settings=settings)
+        article_html_updated = html_update(article_html, article_slug)
+        with open(article_url, 'w') as file:
+            file.write(article_html_updated)
+        articles_sum += 1
 print(':: Article pages — created (' + str(articles_sum) + ')')
 
 # Generate tag pages
@@ -525,6 +533,31 @@ if os.path.isfile(SCSS_FILE):
     minify_css(CSS_MAP)
     print(":: CSS — compiled and minified")
 
+# ------------------------------------------------
+# RSS feed
+# ------------------------------------------------
+
+fg = FeedGenerator()
+fg.title(settings['title'])
+fg.author({'name': settings['title']})
+fg.link(href=settings['main_url'], rel='alternate')
+fg.subtitle(settings['description'])
+fg.language(settings['language'])
+rssfeed = fg.rss_str(pretty=True)
+
+articles_reversed = OrderedDict(reversed(list(articles.items())))
+
+for article in articles:
+    date = articles[article]["last_update"] if articles[article]["last_update"] else articles[article]["publication_date"]
+    if not articles[article]["draft"] and articles[article]["content"]:
+        fe = fg.add_entry()
+        fe.title(articles[article]["title"])
+        fe.link(href=settings['main_url'] + '/' + articles[article]["slug"] + '.html')
+        fe.author({'name': settings['title']})
+        fe.description(articles[article]["content"][:300] + '...')
+        fe.pubDate(datetime.strptime(date, '%d/%m/%Y').strftime('%a %b %d %H:%M:%S %Y') + ' +0200')
+fg.rss_file('public/rss.xml')
+print(":: RSS feed — updated")
 
 # ------------------------------------------------
 # End
