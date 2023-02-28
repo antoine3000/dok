@@ -1,5 +1,5 @@
 <a class="index__link" href="{{ article['url'] }}">{{ article['title'] }}</a>
-<span class="index__update">{{ article['publication_date'] }}</span>
+<span class="index__update">{{ article['last_update'] }}</span>
 {% if article['tags'] %}
 <span class="index__tags">
   {% for tag in article['tags'] %}
