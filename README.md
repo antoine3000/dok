@@ -97,7 +97,25 @@ $ python dok/script.py
 Open your web browser and visit the path provided by the script when you run it. Under Linux, this looks like: `file:///home/antoine/repo/my-project/public/index.html`.
 
 ## Write
+
 ### Metadata
+
+``````
+---
+title: My New Article
+publication_date: 2023-01-01
+last_update: 2023-01-02
+open: True
+draft: False
+excerpt: Content excerpt
+content_first: False
+reversed_order: False
+featured_image: image.jpg
+tags: first, seconds
+toc: True
+---
+``````
+
 ### Markdown
 ### Images
 ### Videos

@@ -304,6 +304,12 @@ def html_update(html, slug):
         elif "small:" in img_src:
             fig_tag['class'] = 'sm'
             img_tag['src'] = img_src.replace('small:', '')
+        elif "mobile:" in img_src:
+            fig_tag['class'] = 'device device--mobile'
+            img_tag['src'] = img_src.replace('mobile:', '')
+        elif "desktop:" in img_src:
+            fig_tag['class'] = 'device device--desktop'
+            img_tag['src'] = img_src.replace('desktop:', '')
         else:
             fig_tag['class'] = 'md'
         if ":flux" in img_src:
