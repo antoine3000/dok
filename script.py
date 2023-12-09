@@ -445,7 +445,7 @@ print(':: Article pages — created (' + str(articles_sum) + ')')
 # Generate tag pages
 tag_template = ENV_DIR.from_string(get_template('tag.html'))
 for tag in tags:
-    tag_url = 'public/' + tag + '.html'
+    tag_url = 'public/tag-' + tag + '.html'
     tag_html = tag_template.render(
         title=tag, articles=tags[tag], settings=settings)
     with open(tag_url, 'w') as file:
