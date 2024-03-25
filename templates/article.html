@@ -53,7 +53,7 @@
           {% for child in article['childs_slug'] %}
             {% set article_child = articles[child] %}
             {% if not article_child['draft'] %}
-            <h3 class="toc__title--sub"><a href="{{ article['slug'] }}.html#{{ article_child['slug'] }}">{{ article_child['title'] }}&nbsp;↓</a></h3>
+            <h3 class="toc__title"><a href="{{ article['slug'] }}.html#{{ article_child['slug'] }}">{{ article_child['title'] }}&nbsp;↓</a></h3>
             {% endif %}
           {% endfor %}
         {% endif %}
