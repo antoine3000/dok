@@ -1,9 +1,22 @@
-<a class="index__link" href="{{ article['url'] }}">{{ article['title'] }}</a>
-<span class="index__update">{{ article['last_update'] }}</span>
-{% if article['tags'] %}
-<span class="index__tags">
-  {% for tag in article['tags'] %}
-  <a href="tag-{{ tag }}.html" class="tags__link">#{{ tag }}</a>
-  {% endfor %}
-</span>
-{% endif %}
+<div class="index__item card">
+  <a class="index__link" href="{{ article['url'] }}">
+    {% if article['featured_image'] %}
+    <img
+      src="medias/{{ article['slug'] }}-{{ article['featured_image'] }}"
+      alt="{{ article['featured_desc'] }}"
+      class="index__img"
+      loading="lazy"
+    />
+    {% else %}
+    <div class="index__color"></div>
+    {% endif %}
+    <h2 class="index__title">{{ article['title'] }}</h2>
+  </a>
+  {% if article['tags'] %}
+  <span class="index__tags">
+    {% for tag in article['tags'] %}
+    <a href="tag-{{ tag }}.html" class="tags__link">#{{ tag }}</a>
+    {% endfor %}
+  </span>
+  {% endif %}
+</div>

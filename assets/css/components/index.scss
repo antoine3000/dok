@@ -9,7 +9,8 @@
   @extend %ts-title-0;
   margin-bottom: var(--size-sm);
 }
-.index__list {
+.index__list,
+.index__grid {
   &,
   &--sub {
     list-style: none;
@@ -93,5 +94,25 @@
   }
   .index__item:not(:last-child) {
     margin-right: var(--size-sm);
+  }
+}
+
+// Index grid
+
+.index--grid .index__list {
+  display: grid;
+  grid-column-gap: var(--size-md);
+  grid-template-columns: repeat(2, 1fr);
+  @include media(">md") {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .index__item {
+    margin-bottom: var(--size-lg);
+  }
+  img {
+    max-width: 100%;
+  }
+  figcaption {
+    @extend %ts-small;
   }
 }

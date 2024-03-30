@@ -296,7 +296,8 @@ def html_update(html, slug):
         img_tag.append(caption)
         img_tag['loading'] = 'lazy'
         fig_tag = soup.new_tag("figure")
-        img_tag['src'] = 'medias/' + article_slug + '-' + img_tag['src']
+        if not img_tag['src'].startswith("medias/"):
+            img_tag['src'] = 'medias/' + article_slug + '-' + img_tag['src']
         img_src = img_tag['src']
         if "large:" in img_src:
             fig_tag['class'] = 'lg'
@@ -469,7 +470,7 @@ print(':: Index page — created')
 
 # Generate content page
 content_template = ENV_DIR.from_string(get_template('content.html'))
-content_html = content_template.render(articles=articles, settings=settings)
+content_html = content_template.render(articles=articles, settings=settings, tags=tags)
 with open('public/content.html', 'w') as file:
     file.write(content_html)
 index_sum += 1

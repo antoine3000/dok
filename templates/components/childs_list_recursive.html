@@ -1,17 +1,11 @@
 {% if childs_slug|length > 0  %}
-<ul class="index__list index__list--sub">
   {% for article in childs_slug recursive %}
   {% set article = articles[article] %}
   {% if not article['draft'] %}
-    <li class="index__item">
       {% include 'components/index_item_content.html' %}
       {% if article['childs_slug']|length > 0 %}
-      <ul class="index__list index__list--sub">
         {{ loop(article['childs_slug']) }}
-      </ul>
       {% endif %}
-    </li>
   {% endif %}
   {% endfor %}
-</ul>
 {% endif %}

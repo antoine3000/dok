@@ -1,13 +1,11 @@
 {% extends "base.html" %} {% set page_class = 'tag' %} {% block content %}
 
-<section class="index index--list">
+<section class="index index--grid">
   <h1 class="index__title">#{{ title }}</h1>
-  <ul class="index__list">
+  <section class="index__list">
     {% for article in articles %}
-      <li class="index__item">
-        {% include "components/index_item_content.html" %}
-      </li>
-    {% endfor %}
-  </ul>
+      {% include "components/index_item_content.html" %}
+  {% endfor %}
+  </section>
 </section>
 {% endblock %}

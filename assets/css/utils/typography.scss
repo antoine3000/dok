@@ -7,7 +7,7 @@
 }
 
 %font-body {
-  font-family: var(--font-body);
+  font-family: var(--font-body) !important;
   @extend %font-base;
 }
 

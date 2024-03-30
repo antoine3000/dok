@@ -1,10 +1,8 @@
 {% if childs_slug|length > 0 %}
-  <ul class="index__list index__list--sub">
   {% for article in childs_slug %}
     {% set article = articles[article] %}
     {% if not article['draft'] %}
-    {% include 'components/child_list_item.html' %}
+      {% include 'components/index_item_content.html' %}
     {% endif %}
   {% endfor %}
-  </ul>
 {% endif %}
