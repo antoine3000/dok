@@ -1,8 +1,0 @@
-{% if childs_slug|length > 0 %}
-  {% for article in childs_slug %}
-    {% set article = articles[article] %}
-    {% if not article['draft'] %}
-      {% include 'components/index_item_content.html' %}
-    {% endif %}
-  {% endfor %}
-{% endif %}

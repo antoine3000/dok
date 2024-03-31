@@ -18,9 +18,8 @@ from collections import OrderedDict
 CONTENT_DIR = 'content'
 PUBLIC_DIR = 'public'
 MEDIAS_DIR = 'public/medias'
-TEMPLATES_DIR = "dok/templates"
+TEMPLATES_DIR = "templates"
 ENV_DIR = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
-IMG_MAX_WIDTH = 1400
 
 
 # ------------------------------------------------
@@ -48,20 +47,13 @@ settings_file = 'settings.yml'
 
 # Default settings
 try:
-    with open('dok/' + settings_file, 'r') as file:
+    with open(settings_file, 'r') as file:
         settings = yaml.load(file, Loader=yaml.SafeLoader)
 except:
     print('Settings file is missing.')
     line()
     print('')
     sys.exit()
-
-# User settings
-if os.path.isfile(settings_file):
-    with open(settings_file, 'r') as file:
-        settings_user = yaml.load(file, Loader=yaml.SafeLoader)
-
-settings.update(settings_user)
 
 
 # ------------------------------------------------
@@ -242,6 +234,12 @@ def convert_links(content):
 
 
 # Medias process
+try:
+    IMG_MAX_WIDTH = settings['img_max_width']
+except ValueError as e:
+    print(e)
+    IMG_MAX_WIDTH = 1400
+
 if not os.path.exists(MEDIAS_DIR):
     os.makedirs(MEDIAS_DIR)
 
@@ -415,10 +413,7 @@ index_sum, articles_sum = 0, 0
 templates = os.listdir(TEMPLATES_DIR)
 
 def get_template(template):
-    if os.path.isfile('templates/' + template):
-        template_file = open('templates/' + template, 'r').read()
-    else:
-        template_file = open('dok/templates/' + template, 'r').read()
+    template_file = open('templates/' + template, 'r').read()
     return template_file
 
 # Make directories if they don't exist

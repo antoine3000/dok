@@ -1,7 +1,0 @@
-title: Dok
-language: "en"
-description: documentation system
-introduction: "Dok, a low-tech tool that allows you to document (almost) everything"
-navigation:
-  "Dok": "index"
-  "Content": "content"
